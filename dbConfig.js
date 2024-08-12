@@ -1,5 +1,5 @@
 // const mysql = require('mysql2');
-const mysql = require("mysql2/promise");
+const mysql = require("mysql2");
 
 const mysqlPool = mysql.createPool({
   host: 'localhost',  // Replace with your MySQL server host
@@ -8,12 +8,15 @@ const mysqlPool = mysql.createPool({
   database: 'tolet'  // Replace with the name of your database
 });
 
-// db.connect((err) => {
-//   if (err) {
-//     console.error('Error connecting to the database:', err);
-//     return;
-//   }
-//   console.log('Successfully to the MySQL database');
-// });
+mysqlPool.getConnection((err, connection) => {
+  
+  if (err) {
+    // console.log("dddd")
+    console.error('Database connection failed:', err);
+    return;
+  }
+  console.log('Connected to the MySQL database');
+  
+});
 
-module.exports =   mysqlPool; // Export the connection pool as a promise
+module.exports =   mysqlPool.promise(); // Export the connection pool as a promise
