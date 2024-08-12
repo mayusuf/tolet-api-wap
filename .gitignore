@@ -24,3 +24,10 @@ yarn-error.log*
 
 # Ignore all files inside the upload directory
 upload/*
+
+# Explicitly ignore image files
+upload/*.png
+upload/*.jpg
+upload/*.jpeg
+upload/*.gif
+upload/*.bmp
