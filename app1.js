@@ -27,6 +27,37 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+
+// GET route to fetch all users
+app.get('/api/users', async (req, res) => {
+
+  const sql = 'SELECT * FROM tbusers';
+  const [rows] = await db.query(sql);
+
+  res.status(200).json({
+    message: 'Users fetched successfully',
+    data: rows
+  });
+});
+
+// GET route to fetch a specific user by ID
+app.get('/api/users/:userid', async (req, res) => {
+  const { userid } = req.params;
+
+  
+    const sql = 'SELECT * FROM tbusers WHERE userid = ?';
+    const [rows] = await db.query(sql, [userid]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({
+      message: 'User fetched successfully',
+      data: rows[0]
+    });
+});
+
 // API endpoint to handle user data with image 
 
 app.post('/api/user', upload.single('imagelink'), async (req, res) => {
@@ -67,7 +98,7 @@ app.post('/api/user', upload.single('imagelink'), async (req, res) => {
 // PUT route to edit user information
 app.put('/api/user', upload.single('imagelink'), async (req, res) => {
 
-  const userid  = req.body.userid;
+  const userid = req.body.userid;
   // const { name, email } = req.body;
 
   // const userid = req.body.userid;

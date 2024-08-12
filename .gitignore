@@ -23,7 +23,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Ignore all files inside the upload directory
-upload/*
+/upload/*
 
 # Explicitly ignore image files
 upload/*.png
