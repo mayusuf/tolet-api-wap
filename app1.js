@@ -29,7 +29,7 @@ const upload = multer({ storage: storage });
 
 // API endpoint to handle user data with image 
 
-app.post('/api/user', upload.single('imagelink'), async(req, res) => {
+app.post('/api/user', upload.single('imagelink'), async (req, res) => {
 
   const userid = req.body.userid;
   const password = await bcrypt.hash(req.body.password, 10);
@@ -49,10 +49,10 @@ app.post('/api/user', upload.single('imagelink'), async(req, res) => {
 
   // Insert data into the database
   const sql = 'INSERT INTO tbusers (userid, password, role, name, address, phone, email, imagelink) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-  
+
   const [result] = await db.query(sql, [userid, password, role, name, address, phone, email, imageFilename]);
 
-  
+
   // Respond with success message
   res.status(200).json({
     message: 'User Data saved successfully!',
@@ -64,9 +64,47 @@ app.post('/api/user', upload.single('imagelink'), async(req, res) => {
 
 
 
+// PUT route to edit user information
+app.put('/api/user', upload.single('imagelink'), async (req, res) => {
+
+  const userid  = req.body.userid;
+  // const { name, email } = req.body;
+
+  // const userid = req.body.userid;
+  const password = await bcrypt.hash(req.body.password, 10);
+  const role = req.body.role;
+  const name = req.body.name;
+  const address = req.body.address;
+  const phone = req.body.phone;
+  const email = req.body.email;
+  const imagelink = req.file;
+
+  if (!imagelink) {
+    return res.status(400).json({ message: 'No image uploaded' });
+  }
+
+  // const imagePath = image.path;
+  const imageFilename = imagelink.filename;
+
+  const sql = 'UPDATE tbusers SET password = ?, role = ?, name = ?, address = ?, phone = ?, email = ?, imagelink = ? WHERE userid = ?';
+  const [result] = await db.query(sql, [password, role, name, address, phone, email, imageFilename, userid]);
+
+  if (result.affectedRows === 0) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  res.status(200).json({
+    message: 'User updated successfully',
+    data: {
+      id: userid
+    }
+  });
+
+});
+
 
 // API endpoint to handle form data with image
-app.post('/upload', upload.single('pic'), async(req, res) => {
+app.post('/upload', upload.single('pic'), async (req, res) => {
 
   const name = req.body.name;
   const image = req.file;
