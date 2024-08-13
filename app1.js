@@ -218,7 +218,7 @@ app.put("/api/book", async(req, res) =>{
   const bookingstatus = req.body.bookingstatus;
   const approvalnote = req.body.approvalnote;
 
-  console.log(req.body)
+  // console.log(req.body)
 
   const sql = 'UPDATE tbbooking SET bookingdate = ?, bookingstatus = ?, approvalnote = ? WHERE bookingid = ?';
   const [result] = await db.query(sql, [bookingdate, bookingstatus, approvalnote, bookingid]);
