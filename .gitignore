@@ -31,3 +31,5 @@ upload/*.jpg
 upload/*.jpeg
 upload/*.gif
 upload/*.bmp
+
+package-lock.json
