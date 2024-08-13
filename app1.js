@@ -65,11 +65,13 @@ app.post('/api/user', upload.single('imagelink'), async (req, res) => {
   const userid = req.body.userid;
   const password = await bcrypt.hash(req.body.password, 10);
   const role = req.body.role;
-  const name = req.body.name;
+  const firstname = req.body.firstname;
+  const lastname = req.body.lastname;
   const address = req.body.address;
   const phone = req.body.phone;
   const email = req.body.email;
   const imagelink = req.file;
+  // console.log(req.body)
 
   if (!imagelink) {
     return res.status(400).json({ message: 'No image uploaded' });
@@ -79,9 +81,9 @@ app.post('/api/user', upload.single('imagelink'), async (req, res) => {
   const imageFilename = imagelink.filename;
 
   // Insert data into the database
-  const sql = 'INSERT INTO tbusers (userid, password, role, name, address, phone, email, imagelink) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+  const sql = 'INSERT INTO tbusers (userid, password, role, firstname, address, phone, email, imagelink, lastname) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
-  const [result] = await db.query(sql, [userid, password, role, name, address, phone, email, imageFilename]);
+  const [result] = await db.query(sql, [userid, password, role, firstname, address, phone, email, imageFilename, lastname]);
 
 
   // Respond with success message
@@ -98,12 +100,11 @@ app.post('/api/user', upload.single('imagelink'), async (req, res) => {
 app.put('/api/user', upload.single('imagelink'), async (req, res) => {
 
   const userid = req.body.userid;
-  // const { name, email } = req.body;
-
-  // const userid = req.body.userid;
+  
   const password = await bcrypt.hash(req.body.password, 10);
   const role = req.body.role;
-  const name = req.body.name;
+  const firstname = req.body.firstname;
+  const lastname = req.body.lastname;
   const address = req.body.address;
   const phone = req.body.phone;
   const email = req.body.email;
@@ -116,8 +117,8 @@ app.put('/api/user', upload.single('imagelink'), async (req, res) => {
   // const imagePath = image.path;
   const imageFilename = imagelink.filename;
 
-  const sql = 'UPDATE tbusers SET password = ?, role = ?, name = ?, address = ?, phone = ?, email = ?, imagelink = ? WHERE userid = ?';
-  const [result] = await db.query(sql, [password, role, name, address, phone, email, imageFilename, userid]);
+  const sql = 'UPDATE tbusers SET password = ?, role = ?, firstname = ?, address = ?, phone = ?, email = ?, imagelink = ? , lastname = ? WHERE userid = ?';
+  const [result] = await db.query(sql, [password, role, firstname, address, phone, email, imageFilename, lastname, userid]);
 
   if (result.affectedRows === 0) {
     return res.status(404).json({ message: 'User not found' });
@@ -141,9 +142,7 @@ app.post('/api/login', async (req, res) => {
   const sql = 'SELECT * FROM tbusers WHERE userid = ?';
   console.log(sql)
   const [result] = await db.query(sql, [userid]);
-  // console.log(result[0].password)
-
-  // Compare the plain-text password with the hashed password
+  
   bcrypt.compare(password, result[0].password, (err, isMatch) => {
     if (err) {
       return res.status(500).json({ message: 'Error comparing passwords', error: err });
@@ -162,6 +161,79 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid user or password' });
     }
   });
+});
+
+app.get("/api/book/:ownerid", async(req, res) =>{
+
+  const {ownerid} = req.params
+  
+
+  const sql = 'SELECT * FROM tbbooing_view WHERE ownerid = ?';
+
+  const [result] = await db.query(sql, [ownerid]);
+
+  if (result.affectedRows === 0) {
+    return res.status(404).json({ message: 'Booking not found' });
+  }
+
+  res.status(200).json({
+    message: 'Bookings fetched successfully',
+    data: result
+  });
+  
+
+});
+
+app.post("/api/book", async(req, res) =>{
+
+  const propertyid = req.body.propertyid;
+  const ownerid = req.body.ownerid;
+  const bookingdate = req.body.bookingdate;
+  const bookedby = req.body.bookedby;
+  const bookingstatus = req.body.bookingstatus;
+  const requestnote = req.body.requestnote;
+  const approvalnote = req.body.approvalnote;
+
+
+  // Insert data into the database
+  const sql = 'INSERT INTO tbbooking (propertyid, ownerid, bookingdate, bookedby, bookingstatus, requestnote, approvalnote) VALUES (?, ?, ?, ?, ?, ?, ?)';
+
+  const [result] = await db.query(sql, [propertyid, ownerid, bookingdate, bookedby, bookingstatus, requestnote, approvalnote]);
+
+  // console.log(result)
+  // Respond with success message
+  res.status(200).json({
+    message: 'Booking Data saved successfully!',
+    data: {
+      id: result.insertId
+    }
+  });
+
+});
+
+app.put("/api/book", async(req, res) =>{
+
+  const bookingid = req.body.bookingid
+  const bookingdate = req.body.bookingdate;
+  const bookingstatus = req.body.bookingstatus;
+  const approvalnote = req.body.approvalnote;
+
+  console.log(req.body)
+
+  const sql = 'UPDATE tbbooking SET bookingdate = ?, bookingstatus = ?, approvalnote = ? WHERE bookingid = ?';
+  const [result] = await db.query(sql, [bookingdate, bookingstatus, approvalnote, bookingid]);
+
+  if (result.affectedRows === 0) {
+    return res.status(404).json({ message: 'Booking not found' });
+  }
+
+  res.status(200).json({
+    message: 'Booking Confirmed',
+    data: {
+      id: bookingid
+    }
+  });
+
 });
 
 // API endpoint to handle form data with image
