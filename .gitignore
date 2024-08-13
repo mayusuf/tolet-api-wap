@@ -33,3 +33,5 @@ upload/*.gif
 upload/*.bmp
 
 package-lock.json
+
+.vs
