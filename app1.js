@@ -166,27 +166,6 @@ app.post('/api/login', async (req, res) => {
   });
 });
 
-app.get("/api/book/:ownerid", async(req, res) =>{
-
-  const {ownerid} = req.params
-  
-
-  const sql = 'SELECT * FROM tbbooing_view WHERE ownerid = ?';
-
-  const [result] = await db.query(sql, [ownerid]);
-
-  if (result.affectedRows === 0) {
-    return res.status(404).json({ message: 'Booking not found' });
-  }
-
-  res.status(200).json({
-    message: 'Bookings fetched successfully',
-    data: result
-  });
-  
-
-});
-
 app.post("/api/book", async(req, res) =>{
 
   const propertyid = req.body.propertyid;
@@ -203,7 +182,6 @@ app.post("/api/book", async(req, res) =>{
 
   const [result] = await db.query(sql, [propertyid, ownerid, bookedby, bookingstatus, requestnote, approvalnote]);
 
-  // console.log(result)
   // Respond with success message
   res.status(200).json({
     message: 'Booking Data saved successfully!',
