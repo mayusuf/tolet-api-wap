@@ -106,7 +106,7 @@ app.get('/property', (req, res) => {
     // No parameters provided, select all properties
     query = `SELECT * FROM tbproperty`;
   }
-  console.log(query)
+  
 
   db.query(query, queryParams, (err, results) => {
     if (err) {
@@ -120,6 +120,30 @@ app.get('/property', (req, res) => {
     }
     res.status(200).json(results);
   });
+});
+
+app.put('/updatepropertystatus/:propertyid',(req,res)=>{
+  
+    const { propertyid } = req.params;
+  
+    const query = `
+     Update tbproperty Set status='sold' WHERE propertyid = ?
+    `;
+  
+    db.query(query, [propertyid], (err, results) => {
+      if (err) {
+        console.error('Error updating data:', err.message);
+        res.status(500).json({ error: 'Database query failed' });
+        return;
+      }
+      if (results.affectedRows === 0) {
+        res.status(404).json({ message: 'Property not found' });
+      } else {
+        res.status(200).json({ message: 'Record updated successfully' });
+      }
+      
+    });
+
 });
 
 
@@ -209,6 +233,32 @@ app.get('/property-images/:propertyid', (req, res) => {
     res.status(200).json(images);
   });
 });
+
+
+app.get('/bookinginfo/:ownerid', (req, res) => {
+  const { ownerid } = req.params;
+  const query = `
+    SELECT * 
+    FROM booking_info WHERE ownerId = ? and bookingStatus='requested'
+  `;
+  db.query(query, [ownerid], (err, results) => {
+    if (err) {
+      console.error('Error retrieving data:', err.message);
+      res.status(500).json({ error: 'Database query failed' });
+      return;
+    }
+    if (results.length === 0) {
+      res.status(404).json({ message: 'Booking information not found' });
+      return;
+    }
+    res.status(200).json(results);
+  });
+});
+
+
+
+
+
 
 
 app.listen(port, () => {
