@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const cors = require('cors');
 const db = require('./dbConfig');
 
 // Create the Express application
@@ -14,6 +14,9 @@ const port = 3010;
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Enable All CORS Requests
+app.use(cors());
 
 // Configure multer for file storage
 const storage = multer.diskStorage({
@@ -235,54 +238,6 @@ app.put("/api/book", async(req, res) =>{
   });
 
 });
-
-// API endpoint to handle form data with image
-// app.post('/upload', upload.single('pic'), async (req, res) => {
-
-//   const name = req.body.name;
-//   const image = req.file;
-
-//   if (!image) {
-//     return res.status(400).json({ message: 'No image uploaded' });
-//   }
-
-//   // const imagePath = image.path;
-//   const imageFilename = image.filename;
-
-//   // Insert data into the database
-//   const sql = 'INSERT INTO profile (name, pic) VALUES (?, ?)';
-//   // console.log(sql)
-//   // db.query(sql, [name, imageFilename]);
-
-//   const [result] = await db.query(sql, [name, imageFilename]);
-
-//   // Respond with success message
-//   res.status(200).json({
-//     message: 'Data saved successfully!',
-//     data: {
-//       id: result.insertId,
-//       name: name,
-//       filename: imageFilename
-//     }
-//   });
-
-// , (err, result) => {
-//   if (err) {
-//     console.error('Error inserting data into the database:', err);
-//     return res.status(500).json({ message: 'Database error', error: err });
-//   }
-
-//   res.status(200).json({
-//     message: 'Form data and image uploaded successfully!',
-//     data: {
-//       name: name,
-//       imageFilename: imageFilename
-//     }
-//   });
-// });
-
-// });
-
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
