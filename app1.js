@@ -188,7 +188,7 @@ app.post("/api/book", async(req, res) =>{
 
   const propertyid = req.body.propertyid;
   const ownerid = req.body.ownerid;
-  const bookingdate = req.body.bookingdate;
+  // const bookingdate = req.body.bookingdate;
   const bookedby = req.body.bookedby;
   const bookingstatus = req.body.bookingstatus;
   const requestnote = req.body.requestnote;
@@ -196,9 +196,9 @@ app.post("/api/book", async(req, res) =>{
 
 
   // Insert data into the database
-  const sql = 'INSERT INTO tbbooking (propertyid, ownerid, bookingdate, bookedby, bookingstatus, requestnote, approvalnote) VALUES (?, ?, ?, ?, ?, ?, ?)';
+  const sql = 'INSERT INTO tbbooking (propertyid, ownerid, bookedby, bookingstatus, requestnote, approvalnote) VALUES (?, ?, ?, ?, ?, ?)';
 
-  const [result] = await db.query(sql, [propertyid, ownerid, bookingdate, bookedby, bookingstatus, requestnote, approvalnote]);
+  const [result] = await db.query(sql, [propertyid, ownerid, bookedby, bookingstatus, requestnote, approvalnote]);
 
   // console.log(result)
   // Respond with success message
@@ -214,14 +214,14 @@ app.post("/api/book", async(req, res) =>{
 app.put("/api/book", async(req, res) =>{
 
   const bookingid = req.body.bookingid
-  const bookingdate = req.body.bookingdate;
+  // const bookingdate = req.body.bookingdate;
   const bookingstatus = req.body.bookingstatus;
   const approvalnote = req.body.approvalnote;
 
   // console.log(req.body)
 
-  const sql = 'UPDATE tbbooking SET bookingdate = ?, bookingstatus = ?, approvalnote = ? WHERE bookingid = ?';
-  const [result] = await db.query(sql, [bookingdate, bookingstatus, approvalnote, bookingid]);
+  const sql = 'UPDATE tbbooking SET  bookingstatus = ?, approvalnote = ? WHERE bookingid = ?';
+  const [result] = await db.query(sql, [bookingstatus, approvalnote, bookingid]);
 
   if (result.affectedRows === 0) {
     return res.status(404).json({ message: 'Booking not found' });
