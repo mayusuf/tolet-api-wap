@@ -546,6 +546,26 @@ app.get('/bookinginfo/:ownerid', (req, res) => {
   });
 });
 
+app.get('/bookinginginfoforconfirm/:bookingId', (req, res) => {
+  const { bookingId } = req.params;
+  const query = `
+    SELECT * 
+    FROM booking_info WHERE bookingId = ? and bookingStatus='requested'
+  `;
+  db.query(query, [bookingId], (err, results) => {
+    if (err) {
+      console.error('Error retrieving data:', err.message);
+      res.status(500).json({ error: 'Database query failed' });
+      return;
+    }
+    if (results.length === 0) {
+      res.status(404).json({ message: 'Booking information not found' });
+      return;
+    }
+    res.status(200).json(results);
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
