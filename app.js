@@ -304,12 +304,19 @@ app.post('/api/user', upload.single('imagelink'), async (req, res) => {
         return res.status(500).json({ error: 'Database insertion failed' });
       }
 
-      res.status(200).json({ message: 'User added successfully with image' });
+      //res.status(200).json({ message: 'User added successfully with image' });
+      res.status(200).json({
+        message: 'User created successfully',
+        data: {
+          id: userid
+        }
+      });
     });
   } catch (err) {
     console.error('Error processing request:', err.message);
     res.status(500).json({ error: 'An error occurred' });
   }
+  
 });
 
 
