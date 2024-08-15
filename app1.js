@@ -195,14 +195,16 @@ app.post("/api/book", async(req, res) =>{
 app.put("/api/book", async(req, res) =>{
 
   const bookingid = req.body.bookingid
-  // const bookingdate = req.body.bookingdate;
+  const propertyid = req.body.propertyid;
   const bookingstatus = req.body.bookingstatus;
   const approvalnote = req.body.approvalnote;
 
-  // console.log(req.body)
-
+  const sql1 = 'UPDATE tbbooking SET  bookingstatus = ? WHERE propertyid = ?';
+  const [result1] = await db.query(sql1, ["rejected", propertyid]);
+  
   const sql = 'UPDATE tbbooking SET  bookingstatus = ?, approvalnote = ? WHERE bookingid = ?';
   const [result] = await db.query(sql, [bookingstatus, approvalnote, bookingid]);
+
 
   if (result.affectedRows === 0) {
     return res.status(404).json({ message: 'Booking not found' });
