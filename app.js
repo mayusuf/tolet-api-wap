@@ -326,41 +326,38 @@ app.post('/api/user', upload.single('imagelink'), async (req, res) => {
 
 
 // PUT route to edit user information
-app.put('/api/user', upload.single('imagelink'), async (req, res) => {
+app.put('/api/user', upload.single('imagelink'), (req, res) => {
+  const { userid, firstname, lastname, address, phone, email } = req.body;
+  const imagelink = req.file ? req.file.filename : null;
 
-  const userid = req.body.userid;
-  
-  const password = await bcrypt.hash(req.body.password, 10);
-  const role = req.body.role;
-  const firstname = req.body.firstname;
-  const lastname = req.body.lastname;
-  const address = req.body.address;
-  const phone = req.body.phone;
-  const email = req.body.email;
-  const imagelink = req.file;
+  if (!userid) {
+    return res.status(400).json({ message: 'User ID is required' });
+  }
 
   if (!imagelink) {
     return res.status(400).json({ message: 'No image uploaded' });
   }
 
-  // const imagePath = image.path;
-  const imageFilename = imagelink.filename;
+  const sql = 'UPDATE tbusers SET firstname = ?, lastname = ?, address = ?, phone = ?, email = ?, imagelink = ? WHERE userid = ?';
 
-  const sql = 'UPDATE tbusers SET password = ?, role = ?, firstname = ?, address = ?, phone = ?, email = ?, imagelink = ? , lastname = ? WHERE userid = ?';
-  const [result] = await db.query(sql, [password, role, firstname, address, phone, email, imageFilename, lastname, userid]);
-
-  if (result.affectedRows === 0) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-
-  res.status(200).json({
-    message: 'User updated successfully',
-    data: {
-      id: userid
+  db.query(sql, [firstname, lastname, address, phone, email, imagelink, userid], (err, results) => {
+    if (err) {
+      console.error('Error updating user:', err.message);
+      return res.status(500).json({ error: 'Database update failed' });
     }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({
+      message: 'User updated successfully',
+      data: {
+        id: userid
+      }
+    });
   });
 });
-
 
 app.put('/updatepropertystatus/:propertyid',(req,res)=>{
   
